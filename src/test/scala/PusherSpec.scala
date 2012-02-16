@@ -38,7 +38,7 @@ object PusherSpec extends Specification {
     "create the right MD5 SUM of the body" in {
       Pusher.md5(body) must be_==("7b3d404f5cde4a0b9b8fb4789a0098cb")
     }
-    "create an event when sent to Pusher" in {
+    "when sending an event to Pusher" in {
       val conf = new java.io.File("pusher.test.properties")
       if (!conf.exists)
         Skipped("no pusher properties file found")
@@ -57,8 +57,14 @@ object PusherSpec extends Specification {
       val channel = config.getProperty("channel_name")
       val client = new PusherClient(id, key, secret, channel)
 
-      Http x (client.handle(Event.name(eventName).data(eventData))) {
-        case (code, _, _, _) => code must be_==(202)
+      "return 202" in {
+        Http x (client.handle(Event.name(eventName).data(eventData))) {
+          case (code, _, _, ent) => code must be_==(202)
+        }
+      }
+      "not return any object" in {
+        val ret = Http(client.handle(Event.name(eventName).data(eventData)))
+        ret must haveClass[runtime.BoxedUnit]
       }
     }
   }

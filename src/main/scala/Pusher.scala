@@ -99,12 +99,12 @@ to a Method and define your own request handler. */
   def default_handler: Request => Handler[T]
 }
 
-trait ResourceMethod extends Method[JValue] {
-  def default_handler = _ ># identity[JValue]
+trait NoReturnMethod extends Method[Unit] {
+  def default_handler = _ >|
 }
 
 object Event extends EventBuilder(None, None)
-private[pusher] class EventBuilder(name: Option[String], data: Option[JValue]) extends ResourceMethod {
+private[pusher] class EventBuilder(name: Option[String], data: Option[JValue]) extends NoReturnMethod {
   def name(eventName: String): EventBuilder = new EventBuilder(Some(eventName), data)
   def data(newData: JValue) = new EventBuilder(name, Some(newData))
 
